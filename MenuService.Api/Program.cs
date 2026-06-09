@@ -4,6 +4,7 @@ using MenuService.Infrastructure.Persistence;
 using MenuService.Infrastructure.Persistence.Seed;
 using Microsoft.EntityFrameworkCore;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Services
@@ -41,6 +42,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(); // Todo lo que esté dentro de wwwroot puede ser servido públicamente.
 
 app.UseAuthorization();
 
