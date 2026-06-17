@@ -2,12 +2,14 @@
 using MenuService.Application.UseCases.Drinks.Commands;
 using MenuService.Application.UseCases.Drinks.Handlers;
 using MenuService.Application.UseCases.Drinks.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MenuService.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class DrinksController : ControllerBase
 {
     private readonly CreateDrinkHandler _createDrinkHandler;
@@ -44,9 +46,6 @@ public class DrinksController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _getDrinkByIdHandler.HandleAsync(new GetDrinkByIdQuery { Id = id });
-
-        if (result is null)
-            return NotFound();
 
         return Ok(result);
     }

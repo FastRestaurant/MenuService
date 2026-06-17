@@ -2,12 +2,14 @@
 using MenuService.Application.UseCases.Dishes.Commands;
 using MenuService.Application.UseCases.Dishes.Handlers;
 using MenuService.Application.UseCases.Dishes.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MenuService.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class DishesController : ControllerBase
 {
     private readonly CreateDishHandler _createDishHandler;
@@ -44,9 +46,6 @@ public class DishesController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _getDishByIdHandler.HandleAsync(new GetDishByIdQuery { Id = id });
-
-        if (result is null)
-            return NotFound();
 
         return Ok(result);
     }

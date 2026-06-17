@@ -2,12 +2,14 @@
 using MenuService.Application.UseCases.Categories.Commands;
 using MenuService.Application.UseCases.Categories.Handlers;
 using MenuService.Application.UseCases.Categories.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MenuService.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class CategoriesController : ControllerBase
 {
     private readonly CreateCategoryHandler _createCategoryHandler;

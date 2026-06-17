@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MenuService.Application.DTOs.Drinks;
 using MenuService.Application.Interfaces;
 using MenuService.Application.UseCases.Drinks.Queries;
+using MenuService.Domain.Exceptions;
 
 namespace MenuService.Application.UseCases.Drinks.Handlers;
 
@@ -19,12 +20,12 @@ public class GetDrinkByIdHandler
         _drinkRepository = drinkRepository;
     }
 
-    public async Task<DrinkDto?> HandleAsync(GetDrinkByIdQuery query)
+    public async Task<DrinkDto> HandleAsync(GetDrinkByIdQuery query)
     {
         var drink = await _drinkRepository.GetByIdAsync(query.Id);
 
         if (drink is null)
-            return null;
+            throw new NotFoundException("La bebida no fue encontrada.");
 
         return new DrinkDto
         {

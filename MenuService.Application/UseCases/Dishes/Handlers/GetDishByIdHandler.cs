@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MenuService.Application.DTOs.Dishes;
 using MenuService.Application.Interfaces;
 using MenuService.Application.UseCases.Dishes.Queries;
+using MenuService.Domain.Exceptions;
 
 namespace MenuService.Application.UseCases.Dishes.Handlers;
 
@@ -19,12 +20,12 @@ public class GetDishByIdHandler
         _dishRepository = dishRepository;
     }
 
-    public async Task<DishDto?> HandleAsync(GetDishByIdQuery query)
+    public async Task<DishDto> HandleAsync(GetDishByIdQuery query)
     {
         var dish = await _dishRepository.GetByIdAsync(query.Id);
 
         if (dish is null)
-            return null;
+            throw new NotFoundException("El plato no fue encontrado.");
 
         return new DishDto
         {

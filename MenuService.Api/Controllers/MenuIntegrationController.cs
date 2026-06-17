@@ -2,12 +2,14 @@
 using MenuService.Application.UseCases.Dishes.Queries;
 using MenuService.Application.UseCases.Drinks.Handlers;
 using MenuService.Application.UseCases.Drinks.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MenuService.Api.Controllers;
 
 [ApiController]
 [Route("api/menu-integration")]
+[Authorize(Roles = "Admin,Waitress,Kitchen")]
 public class MenuIntegrationController : ControllerBase
 {
     private readonly GetDishForOrderHandler _getDishForOrderHandler;
