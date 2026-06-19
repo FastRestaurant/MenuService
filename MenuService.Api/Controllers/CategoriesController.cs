@@ -9,7 +9,7 @@ namespace MenuService.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Waitress")]
 public class CategoriesController : ControllerBase
 {
     private readonly CreateCategoryHandler _createCategoryHandler;
@@ -49,6 +49,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
         var result = await _createCategoryHandler.HandleAsync(new CreateCategoryCommand
@@ -60,6 +61,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryDto dto)
     {
         var result = await _updateCategoryHandler.HandleAsync(new UpdateCategoryCommand
@@ -72,6 +74,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _deleteCategoryHandler.HandleAsync(new DeleteCategoryCommand { Id = id });

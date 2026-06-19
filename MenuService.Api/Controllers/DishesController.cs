@@ -9,7 +9,7 @@ namespace MenuService.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Waitress")]
 public class DishesController : ControllerBase
 {
     private readonly CreateDishHandler _createDishHandler;
@@ -62,6 +62,7 @@ public class DishesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateDishDto dto)
     {
         var result = await _createDishHandler.HandleAsync(new CreateDishCommand
@@ -73,6 +74,7 @@ public class DishesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDishDto dto)
     {
         var result = await _updateDishHandler.HandleAsync(new UpdateDishCommand
@@ -85,6 +87,7 @@ public class DishesController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _deleteDishHandler.HandleAsync(new DeleteDishCommand { Id = id });
