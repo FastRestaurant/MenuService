@@ -20,11 +20,14 @@ public class DishRepository : IDishRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Dish>> GetAllAsync()
+    public async Task<IEnumerable<Dish>> GetAllAsync(int pageNumber, int pageSize)
     {
         return await _context.Dishes
             .AsNoTracking()
             .Include(x => x.Category)
+            .OrderBy(x => x.Name)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
     }
 
@@ -35,12 +38,18 @@ public class DishRepository : IDishRepository
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<IEnumerable<Dish>> GetByCategoryIdAsync(Guid categoryId)
+    public async Task<IEnumerable<Dish>> GetByCategoryIdAsync(
+        Guid categoryId,
+        int pageNumber,
+        int pageSize)
     {
         return await _context.Dishes
             .AsNoTracking()
             .Include(x => x.Category)
             .Where(x => x.CategoryId == categoryId)
+            .OrderBy(x => x.Name)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
     }
 

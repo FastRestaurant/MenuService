@@ -21,7 +21,9 @@ public class GetAllDrinksHandler
 
     public async Task<IEnumerable<DrinkDto>> HandleAsync(GetAllDrinksQuery query)
     {
-        var drinks = await _drinkRepository.GetAllAsync();
+        var drinks = await _drinkRepository.GetAllAsync(
+            query.PageNumber,
+            query.PageSize);
 
         return drinks.Select(drink => new DrinkDto
         {

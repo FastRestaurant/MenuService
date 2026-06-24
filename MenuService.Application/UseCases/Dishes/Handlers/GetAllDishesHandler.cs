@@ -21,7 +21,9 @@ public class GetAllDishesHandler
 
     public async Task<IEnumerable<DishDto>> HandleAsync(GetAllDishesQuery query)
     {
-        var dishes = await _dishRepository.GetAllAsync();
+        var dishes = await _dishRepository.GetAllAsync(
+            query.PageNumber,
+            query.PageSize);
 
         return dishes.Select(dish => new DishDto
         {

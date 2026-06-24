@@ -30,7 +30,10 @@ public class GetDrinksByCategoryHandler
         if (category is null)
             throw new NotFoundException("La categoría no fue encontrada.");
 
-        var drinks = await _drinkRepository.GetByCategoryIdAsync(query.CategoryId);
+        var drinks = await _drinkRepository.GetByCategoryIdAsync(
+            query.CategoryId,
+            query.PageNumber,
+            query.PageSize);
 
         return drinks.Select(drink => new DrinkDto
         {

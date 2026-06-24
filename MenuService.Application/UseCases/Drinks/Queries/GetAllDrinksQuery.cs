@@ -8,4 +8,8 @@ namespace MenuService.Application.UseCases.Drinks.Queries;
 
 public class GetAllDrinksQuery
 {
+    public int PageNumber { get; set; } = 1;
+
+    public int PageSize { get; set; } = 10;
+
 }

@@ -20,11 +20,14 @@ public class DrinkRepository : IDrinkRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Drink>> GetAllAsync()
+    public async Task<IEnumerable<Drink>> GetAllAsync(int pageNumber, int pageSize)
     {
         return await _context.Drinks
             .AsNoTracking()
             .Include(x => x.Category)
+            .OrderBy(x => x.Name)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
     }
 
@@ -35,12 +38,18 @@ public class DrinkRepository : IDrinkRepository
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<IEnumerable<Drink>> GetByCategoryIdAsync(Guid categoryId)
+    public async Task<IEnumerable<Drink>> GetByCategoryIdAsync(
+        Guid categoryId,
+        int pageNumber,
+        int pageSize)
     {
         return await _context.Drinks
             .AsNoTracking()
             .Include(x => x.Category)
             .Where(x => x.CategoryId == categoryId)
+            .OrderBy(x => x.Name)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
     }
 

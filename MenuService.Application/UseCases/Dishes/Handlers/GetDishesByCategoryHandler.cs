@@ -1,12 +1,13 @@
-﻿using MenuService.Application.DTOs.Dishes;
-using MenuService.Application.Interfaces;
-using MenuService.Application.UseCases.Dishes.Queries;
-using MenuService.Domain.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using MenuService.Application.DTOs.Dishes;
+using MenuService.Application.Interfaces;
+using MenuService.Application.UseCases.Dishes.Queries;
+using MenuService.Domain.Exceptions;
 
 namespace MenuService.Application.UseCases.Dishes.Handlers;
 
@@ -30,7 +31,10 @@ public class GetDishesByCategoryHandler
         if (category is null)
             throw new NotFoundException("La categoría no fue encontrada.");
 
-        var dishes = await _dishRepository.GetByCategoryIdAsync(query.CategoryId);
+        var dishes = await _dishRepository.GetByCategoryIdAsync(
+            query.CategoryId,
+            query.PageNumber,
+            query.PageSize);
 
         return dishes.Select(dish => new DishDto
         {

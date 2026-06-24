@@ -10,9 +10,9 @@ namespace MenuService.Application.Interfaces;
 
 public interface IDishRepository
 {
-    Task<IEnumerable<Dish>> GetAllAsync();
+    Task<IEnumerable<Dish>> GetAllAsync(int pageNumber, int pageSize);
     Task<Dish?> GetByIdAsync(Guid id);
-    Task<IEnumerable<Dish>> GetByCategoryIdAsync(Guid categoryId);
+    Task<IEnumerable<Dish>> GetByCategoryIdAsync(Guid categoryId, int pageNumber, int pageSize);
     Task AddAsync(Dish dish);
     void Update(Dish dish);
     void Delete(Dish dish);
