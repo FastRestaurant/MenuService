@@ -2,12 +2,14 @@
 using MenuService.Application.UseCases.Drinks.Commands;
 using MenuService.Application.UseCases.Drinks.Handlers;
 using MenuService.Application.UseCases.Drinks.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MenuService.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin,Waitress")]
 public class DrinksController : ControllerBase
 {
     private readonly CreateDrinkHandler _createDrinkHandler;
@@ -50,6 +52,10 @@ public class DrinksController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _getDrinkByIdHandler.HandleAsync(new GetDrinkByIdQuery { Id = id });
+<<<<<<< HEAD
+=======
+
+>>>>>>> 34cbd93e06be99c72ca561340d10f29cf75cc0d3
         return Ok(result);
     }
 
@@ -70,6 +76,7 @@ public class DrinksController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateDrinkDto dto)
     {
         var result = await _createDrinkHandler.HandleAsync(new CreateDrinkCommand
@@ -81,6 +88,7 @@ public class DrinksController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDrinkDto dto)
     {
         var result = await _updateDrinkHandler.HandleAsync(new UpdateDrinkCommand
@@ -93,6 +101,7 @@ public class DrinksController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _deleteDrinkHandler.HandleAsync(new DeleteDrinkCommand { Id = id });

@@ -8,6 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+<<<<<<< HEAD
+=======
+using MenuService.Application.DTOs.Drinks;
+using MenuService.Application.Interfaces;
+using MenuService.Application.UseCases.Drinks.Queries;
+using MenuService.Domain.Exceptions;
+
+>>>>>>> 34cbd93e06be99c72ca561340d10f29cf75cc0d3
 namespace MenuService.Application.UseCases.Drinks.Handlers;
 
 public class GetDrinkByIdHandler

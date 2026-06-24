@@ -8,6 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+<<<<<<< HEAD
+=======
+using MenuService.Application.DTOs.Dishes;
+using MenuService.Application.Interfaces;
+using MenuService.Application.UseCases.Dishes.Queries;
+using MenuService.Domain.Exceptions;
+
+>>>>>>> 34cbd93e06be99c72ca561340d10f29cf75cc0d3
 namespace MenuService.Application.UseCases.Dishes.Handlers;
 
 public class GetDishByIdHandler
