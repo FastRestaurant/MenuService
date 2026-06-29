@@ -17,6 +17,9 @@ public class CreateDrinkDto
     [MaxLength(150, ErrorMessage = "El nombre no puede superar los 150 caracteres.")]
     public string Name { get; set; } = string.Empty;
 
+    [MaxLength(100, ErrorMessage = "La marca no puede superar los 100 caracteres.")]
+    public string? Brand { get; set; }
+
     [MaxLength(500, ErrorMessage = "La descripción no puede superar los 500 caracteres.")]
     public string? Description { get; set; }
 

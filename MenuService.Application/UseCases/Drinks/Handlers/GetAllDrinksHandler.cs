@@ -22,11 +22,22 @@ public class GetAllDrinksHandler
 
     public async Task<PagedResultDto<DrinkDto>> HandleAsync(GetAllDrinksQuery query)
     {
-        var totalItems = await _drinkRepository.CountAsync();
+        if (query.PageNumber < 1) query.PageNumber = 1;
+        if (query.PageSize < 1) query.PageSize = 10;
+        if (query.PageSize > 50) query.PageSize = 50;
+
+        var totalItems = await _drinkRepository.CountAsync(query.Search, query.Available);
+        var totalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize);
+
+        if (totalPages > 0 && query.PageNumber > totalPages)
+            query.PageNumber = totalPages;
 
         var drinks = await _drinkRepository.GetAllAsync(
             query.PageNumber,
-            query.PageSize);
+            query.PageSize,
+            query.Search,
+            query.Available,
+            query.Sort);
 
         var items = drinks.Select(drink => new DrinkDto
         {
@@ -34,6 +45,7 @@ public class GetAllDrinksHandler
             CategoryId = drink.CategoryId,
             CategoryName = drink.Category?.Name ?? string.Empty,
             Name = drink.Name,
+            Brand = drink.Brand,
             Description = drink.Description,
             Price = drink.Price,
             Available = drink.Available,
@@ -48,7 +60,7 @@ public class GetAllDrinksHandler
             PageNumber = query.PageNumber,
             PageSize = query.PageSize,
             TotalItems = totalItems,
-            TotalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize)
+            TotalPages = totalPages
         };
     }
 }

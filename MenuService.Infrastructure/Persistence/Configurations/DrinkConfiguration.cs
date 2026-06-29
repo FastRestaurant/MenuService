@@ -25,6 +25,9 @@ public class DrinkConfiguration : IEntityTypeConfiguration<Drink>
             .IsRequired()
             .HasMaxLength(150);
 
+        builder.Property(x => x.Brand)
+            .HasMaxLength(100);
+
         builder.Property(x => x.Description)
             .HasMaxLength(500);
 

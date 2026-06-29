@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MenuService.Api.Controllers;
 
 [ApiController]
-[Route("api/menu-integration")]
+[Route("api/v1/menu-integration")]
 [Authorize(Roles = "Admin,Waitress,Kitchen")]
 public class MenuIntegrationController : ControllerBase
 {

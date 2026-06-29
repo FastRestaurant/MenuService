@@ -31,6 +31,25 @@ public class DrinkRepository : IDrinkRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Drink>> GetAllAsync(int pageNumber, int pageSize, string? search, bool? available, string? sort)
+    {
+        var query = ApplyFilters(_context.Drinks
+            .AsNoTracking()
+            .Include(x => x.Category), search, available);
+
+        query = sort switch
+        {
+            "precio-asc" => query.OrderBy(x => x.Price).ThenBy(x => x.Name),
+            "precio-desc" => query.OrderByDescending(x => x.Price).ThenBy(x => x.Name),
+            _ => query.OrderBy(x => x.Name)
+        };
+
+        return await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
     public async Task<Drink?> GetByIdAsync(Guid id)
     {
         return await _context.Drinks
@@ -73,9 +92,31 @@ public class DrinkRepository : IDrinkRepository
         return await _context.Drinks.CountAsync();
     }
 
+    public async Task<int> CountAsync(string? search, bool? available)
+    {
+        return await ApplyFilters(_context.Drinks.AsNoTracking(), search, available).CountAsync();
+    }
+
     public async Task<int> CountByCategoryIdAsync(Guid categoryId)
     {
         return await _context.Drinks
             .CountAsync(drink => drink.CategoryId == categoryId);
+    }
+
+    private static IQueryable<Drink> ApplyFilters(IQueryable<Drink> query, string? search, bool? available)
+    {
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(drink =>
+                drink.Name.Contains(term) ||
+                (drink.Brand != null && drink.Brand.Contains(term)) ||
+                (drink.Description != null && drink.Description.Contains(term)));
+        }
+
+        if (available.HasValue)
+            query = query.Where(drink => drink.Available == available.Value);
+
+        return query;
     }
 }

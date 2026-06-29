@@ -43,6 +43,7 @@ public class UpdateDrinkHandler
 
         drink.CategoryId = command.Drink.CategoryId;
         drink.Name = command.Drink.Name;
+        drink.Brand = command.Drink.Brand;
         drink.Description = command.Drink.Description;
         drink.Price = command.Drink.Price;
         drink.Available = command.Drink.Available;
@@ -58,6 +59,7 @@ public class UpdateDrinkHandler
             CategoryId = drink.CategoryId,
             CategoryName = category.Name,
             Name = drink.Name,
+            Brand = drink.Brand,
             Description = drink.Description,
             Price = drink.Price,
             Available = drink.Available,

@@ -45,6 +45,7 @@ public class GetDrinksByCategoryHandler
             CategoryId = drink.CategoryId,
             CategoryName = drink.Category?.Name ?? category.Name,
             Name = drink.Name,
+            Brand = drink.Brand,
             Description = drink.Description,
             Price = drink.Price,
             Available = drink.Available,

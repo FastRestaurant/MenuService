@@ -31,6 +31,27 @@ public class DishRepository : IDishRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Dish>> GetAllAsync(int pageNumber, int pageSize, string? search, bool? available, string? sort)
+    {
+        var query = ApplyFilters(_context.Dishes
+            .AsNoTracking()
+            .Include(x => x.Category), search, available);
+
+        query = sort switch
+        {
+            "precio-asc" => query.OrderBy(x => x.Price).ThenBy(x => x.Name),
+            "precio-desc" => query.OrderByDescending(x => x.Price).ThenBy(x => x.Name),
+            "tiempo-asc" => query.OrderBy(x => x.EstimatedPreparationMinutes).ThenBy(x => x.Name),
+            "tiempo-desc" => query.OrderByDescending(x => x.EstimatedPreparationMinutes).ThenBy(x => x.Name),
+            _ => query.OrderBy(x => x.Name)
+        };
+
+        return await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
     public async Task<Dish?> GetByIdAsync(Guid id)
     {
         return await _context.Dishes
@@ -73,9 +94,31 @@ public class DishRepository : IDishRepository
         return await _context.Dishes.CountAsync();
     }
 
+    public async Task<int> CountAsync(string? search, bool? available)
+    {
+        return await ApplyFilters(_context.Dishes.AsNoTracking(), search, available).CountAsync();
+    }
+
     public async Task<int> CountByCategoryIdAsync(Guid categoryId)
     {
         return await _context.Dishes
             .CountAsync(dish => dish.CategoryId == categoryId);
+    }
+
+    private static IQueryable<Dish> ApplyFilters(IQueryable<Dish> query, string? search, bool? available)
+    {
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(dish =>
+                dish.Name.Contains(term) ||
+                (dish.Description != null && dish.Description.Contains(term)) ||
+                (dish.Category != null && dish.Category.Name.Contains(term)));
+        }
+
+        if (available.HasValue)
+            query = query.Where(dish => dish.Available == available.Value);
+
+        return query;
     }
 }

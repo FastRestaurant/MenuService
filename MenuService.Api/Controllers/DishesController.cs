@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MenuService.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/dishes")]
 [Authorize(Roles = "Admin,Waitress")]
 public class DishesController : ControllerBase
 {
@@ -39,12 +39,18 @@ public class DishesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<PagedResultDto<DishDto>>> GetAll(
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null,
+        [FromQuery] bool? available = null,
+        [FromQuery] string? sort = null)
     {
         var result = await _getAllDishesHandler.HandleAsync(new GetAllDishesQuery
         {
             PageNumber = pageNumber,
-            PageSize = pageSize
+            PageSize = pageSize,
+            Search = search,
+            Available = available,
+            Sort = sort
         });
 
         return Ok(result);

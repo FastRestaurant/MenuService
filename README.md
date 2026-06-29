@@ -249,10 +249,10 @@ Atributos principales:
 Endpoints:
 
 ```txt
-GET /api/menu-integration/dishes/{id}/for-order
-GET /api/menu-integration/drinks/{id}/for-order
-GET /api/menu-integration/dishes/{id}/exists
-GET /api/menu-integration/dishes/{id}/preparation-time
+GET /api/v1/menu-integration/dishes/{id}/for-order
+GET /api/v1/menu-integration/drinks/{id}/for-order
+GET /api/v1/menu-integration/dishes/{id}/exists
+GET /api/v1/menu-integration/dishes/{id}/preparation-time
 ```
 
 ---

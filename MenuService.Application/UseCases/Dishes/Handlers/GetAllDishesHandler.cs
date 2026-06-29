@@ -22,11 +22,22 @@ public class GetAllDishesHandler
 
     public async Task<PagedResultDto<DishDto>> HandleAsync(GetAllDishesQuery query)
     {
-        var totalItems = await _dishRepository.CountAsync();
+        if (query.PageNumber < 1) query.PageNumber = 1;
+        if (query.PageSize < 1) query.PageSize = 10;
+        if (query.PageSize > 50) query.PageSize = 50;
+
+        var totalItems = await _dishRepository.CountAsync(query.Search, query.Available);
+        var totalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize);
+
+        if (totalPages > 0 && query.PageNumber > totalPages)
+            query.PageNumber = totalPages;
 
         var dishes = await _dishRepository.GetAllAsync(
             query.PageNumber,
-            query.PageSize);
+            query.PageSize,
+            query.Search,
+            query.Available,
+            query.Sort);
 
         var items = dishes.Select(dish => new DishDto
         {
@@ -49,7 +60,7 @@ public class GetAllDishesHandler
             PageNumber = query.PageNumber,
             PageSize = query.PageSize,
             TotalItems = totalItems,
-            TotalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize)
+            TotalPages = totalPages
         };
     }
 }

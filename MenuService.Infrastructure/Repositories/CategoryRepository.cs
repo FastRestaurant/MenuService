@@ -45,6 +45,16 @@ public class CategoryRepository : ICategoryRepository
             .AnyAsync(x => x.Name == name);
     }
 
+    public async Task<int> CountDishesAsync(Guid categoryId)
+    {
+        return await _context.Dishes.CountAsync(x => x.CategoryId == categoryId);
+    }
+
+    public async Task<int> CountDrinksAsync(Guid categoryId)
+    {
+        return await _context.Drinks.CountAsync(x => x.CategoryId == categoryId);
+    }
+
     public async Task AddAsync(Category category)
     {
         await _context.Categories.AddAsync(category);

@@ -12,6 +12,8 @@ namespace MenuService.Application.UseCases.Categories.Handlers;
 
 public class UpdateCategoryHandler
 {
+    private const string FixedDrinksCategoryName = "Bebidas";
+
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
 
@@ -29,6 +31,9 @@ public class UpdateCategoryHandler
 
         if (category is null)
             throw new NotFoundException("La categoría no fue encontrada.");
+
+        if (category.Name.Equals(FixedDrinksCategoryName, StringComparison.OrdinalIgnoreCase))
+            throw new ConflictException("La categoría Bebidas es fija y no se puede modificar.");
 
         var categoryWithSameName = await _categoryRepository.GetByNameAsync(command.Category.Name);
 

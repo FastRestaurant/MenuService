@@ -9,8 +9,6 @@ public static class MenuDbSeeder
 {
     public static async Task SeedAsync(MenuDbContext context)
     {
-        await RemoveTestDataAsync(context);
-
         var now = DateTime.UtcNow;
         var categories = BuildCategories(now);
 
@@ -31,24 +29,11 @@ public static class MenuDbSeeder
         await context.SaveChangesAsync();
     }
 
-    private static async Task RemoveTestDataAsync(MenuDbContext context)
-    {
-        await context.Database.ExecuteSqlRawAsync("DELETE FROM [Dishes] WHERE [Name] LIKE 'E2E%'");
-        await context.Database.ExecuteSqlRawAsync("DELETE FROM [Drinks] WHERE [Name] LIKE 'E2E%'");
-        await context.Database.ExecuteSqlRawAsync("DELETE FROM [Categories] WHERE [Name] LIKE 'E2E%'");
-    }
-
     private static async Task EnsureCategoryAsync(MenuDbContext context, Category category)
     {
         var existing = await context.Categories.FirstOrDefaultAsync(x => x.Name == category.Name);
         if (existing is null)
-        {
             context.Categories.Add(category);
-            return;
-        }
-
-        existing.Description = category.Description;
-        existing.UpdatedAt = DateTime.UtcNow;
     }
 
     private static async Task EnsureDishAsync(MenuDbContext context, Dish dish)
@@ -59,20 +44,6 @@ public static class MenuDbSeeder
             context.Dishes.Add(dish);
             return;
         }
-
-        if (existing.Id != dish.Id)
-            await context.Database.ExecuteSqlInterpolatedAsync($"UPDATE [Dishes] SET [Id] = {dish.Id} WHERE [Id] = {existing.Id}");
-
-        await context.Database.ExecuteSqlInterpolatedAsync($@"
-            UPDATE [Dishes]
-            SET [CategoryId] = {dish.CategoryId},
-                [Description] = {dish.Description},
-                [Price] = {dish.Price},
-                [EstimatedPreparationMinutes] = {dish.EstimatedPreparationMinutes},
-                [Available] = {dish.Available},
-                [ImageUrl] = {dish.ImageUrl},
-                [UpdatedAt] = {DateTime.UtcNow}
-            WHERE [Id] = {dish.Id}");
     }
 
     private static async Task EnsureDrinkAsync(MenuDbContext context, Drink drink)
@@ -83,19 +54,6 @@ public static class MenuDbSeeder
             context.Drinks.Add(drink);
             return;
         }
-
-        if (existing.Id != drink.Id)
-            await context.Database.ExecuteSqlInterpolatedAsync($"UPDATE [Drinks] SET [Id] = {drink.Id} WHERE [Id] = {existing.Id}");
-
-        await context.Database.ExecuteSqlInterpolatedAsync($@"
-            UPDATE [Drinks]
-            SET [CategoryId] = {drink.CategoryId},
-                [Description] = {drink.Description},
-                [Price] = {drink.Price},
-                [Available] = {drink.Available},
-                [ImageUrl] = {drink.ImageUrl},
-                [UpdatedAt] = {DateTime.UtcNow}
-            WHERE [Id] = {drink.Id}");
     }
 
     private static List<Category> BuildCategories(DateTime now) => new()
@@ -136,16 +94,16 @@ public static class MenuDbSeeder
 
     private static List<Drink> BuildDrinks(IReadOnlyDictionary<string, Guid> categories, DateTime now) => new()
     {
-        Drink(categories, now, "Coca-Cola 500ml", "Gaseosa cola individual", 1800, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358287/coca-cola-500ml_rn4bhr.jpg"),
-        Drink(categories, now, "Agua mineral 500ml", "Agua mineral sin gas", 1200, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358250/agua-mineral-500ml_vdkfzu.jpg"),
-        Drink(categories, now, "Sprite 500ml", "Gaseosa lima limón individual", 1800, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358323/sprite-500ml_przhre.jpg"),
-        Drink(categories, now, "Fanta 500ml", "Gaseosa sabor naranja individual", 1800, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358295/fanta-500ml_gp50z4.jpg"),
-        Drink(categories, now, "Agua con gas 500ml", "Agua mineral con gas", 1300, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358241/agua-con-gas-500ml_r0jnme.jpg"),
-        Drink(categories, now, "Jugo de naranja", "Jugo natural de naranja", 2200, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358307/jugo-de-naranja_otlza5.jpg"),
-        Drink(categories, now, "Limonada", "Limonada casera con menta", 2400, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358313/limonada_pv8tpi.jpg"),
-        Drink(categories, now, "Cerveza Quilmes", "Cerveza rubia 473ml", 2600, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358265/cerveza-quilmes_l4gk4g.jpg"),
-        Drink(categories, now, "Cerveza Stella Artois", "Cerveza rubia 473ml", 3200, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358274/cerveza-stella-artois_lpewpl.jpg"),
-        Drink(categories, now, "Café", "Café caliente", 1500, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358258/cafe_yvrl2v.jpg")
+        Drink(categories, now, "Coca-Cola 500ml", "Coca-Cola", "Gaseosa cola individual", 1800, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358287/coca-cola-500ml_rn4bhr.jpg"),
+        Drink(categories, now, "Agua mineral 500ml", "Eco de los Andes", "Agua mineral sin gas", 1200, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358250/agua-mineral-500ml_vdkfzu.jpg"),
+        Drink(categories, now, "Sprite 500ml", "Sprite", "Gaseosa lima limón individual", 1800, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358323/sprite-500ml_przhre.jpg"),
+        Drink(categories, now, "Fanta 500ml", "Fanta", "Gaseosa sabor naranja individual", 1800, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358295/fanta-500ml_gp50z4.jpg"),
+        Drink(categories, now, "Agua con gas 500ml", "Eco de los Andes", "Agua mineral con gas", 1300, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358241/agua-con-gas-500ml_r0jnme.jpg"),
+        Drink(categories, now, "Jugo de naranja", "De la casa", "Jugo natural de naranja", 2200, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358307/jugo-de-naranja_otlza5.jpg"),
+        Drink(categories, now, "Limonada", "De la casa", "Limonada casera con menta", 2400, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358313/limonada_pv8tpi.jpg"),
+        Drink(categories, now, "Cerveza Quilmes", "Quilmes", "Cerveza rubia 473ml", 2600, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358265/cerveza-quilmes_l4gk4g.jpg"),
+        Drink(categories, now, "Cerveza Stella Artois", "Stella Artois", "Cerveza rubia 473ml", 3200, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358274/cerveza-stella-artois_lpewpl.jpg"),
+        Drink(categories, now, "Café", "De la casa", "Café caliente", 1500, "https://res.cloudinary.com/dez2fwxfe/image/upload/v1782358258/cafe_yvrl2v.jpg")
     };
 
     private static Dish Dish(IReadOnlyDictionary<string, Guid> categories, DateTime now, string categoryName, string name, string description, decimal price, int minutes, string imageUrl)
@@ -162,12 +120,13 @@ public static class MenuDbSeeder
             CreatedAt = now
         };
 
-    private static Drink Drink(IReadOnlyDictionary<string, Guid> categories, DateTime now, string name, string description, decimal price, string imageUrl)
+    private static Drink Drink(IReadOnlyDictionary<string, Guid> categories, DateTime now, string name, string brand, string description, decimal price, string imageUrl)
         => new()
         {
             Id = StableId($"drink:{name}"),
             CategoryId = categories["Bebidas"],
             Name = name,
+            Brand = brand,
             Description = description,
             Price = price,
             Available = true,

@@ -17,4 +17,6 @@ public interface ICategoryRepository
     void Update(Category category);
     void Delete(Category category);
     Task<bool> ExistsByNameAsync(string name);
+    Task<int> CountDishesAsync(Guid categoryId);
+    Task<int> CountDrinksAsync(Guid categoryId);
 }

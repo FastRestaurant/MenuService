@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MenuService.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/categories")]
 [Authorize(Roles = "Admin,Waitress")]
 public class CategoriesController : ControllerBase
 {
