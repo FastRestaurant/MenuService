@@ -1,4 +1,5 @@
-﻿using MenuService.Application.DTOs.Common;
+﻿using MenuService.Application.DTOs;
+using MenuService.Application.DTOs.Common;
 using MenuService.Application.DTOs.Dishes;
 using MenuService.Application.UseCases.Dishes.Commands;
 using MenuService.Application.UseCases.Dishes.Handlers;
@@ -37,6 +38,9 @@ public class DishesController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(PagedResultDto<DishDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<PagedResultDto<DishDto>>> GetAll(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
@@ -57,6 +61,10 @@ public class DishesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(DishDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _getDishByIdHandler.HandleAsync(new GetDishByIdQuery { Id = id });
@@ -65,6 +73,10 @@ public class DishesController : ControllerBase
     }
 
     [HttpGet("category/{categoryId:guid}")]
+    [ProducesResponseType(typeof(PagedResultDto<DishDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PagedResultDto<DishDto>>> GetByCategory(
         Guid categoryId,
         [FromQuery] int pageNumber = 1,
@@ -82,6 +94,12 @@ public class DishesController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(DishDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] CreateDishDto dto)
     {
         var result = await _createDishHandler.HandleAsync(new CreateDishCommand
@@ -94,6 +112,12 @@ public class DishesController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(DishDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDishDto dto)
     {
         var result = await _updateDishHandler.HandleAsync(new UpdateDishCommand
@@ -107,6 +131,10 @@ public class DishesController : ControllerBase
 
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _deleteDishHandler.HandleAsync(new DeleteDishCommand { Id = id });

@@ -1,4 +1,7 @@
-﻿using MenuService.Application.UseCases.Dishes.Handlers;
+﻿using MenuService.Application.DTOs;
+using MenuService.Application.DTOs.Dishes;
+using MenuService.Application.DTOs.Drinks;
+using MenuService.Application.UseCases.Dishes.Handlers;
 using MenuService.Application.UseCases.Dishes.Queries;
 using MenuService.Application.UseCases.Drinks.Handlers;
 using MenuService.Application.UseCases.Drinks.Queries;
@@ -30,6 +33,10 @@ public class MenuIntegrationController : ControllerBase
     }
 
     [HttpGet("dishes/{id:guid}/for-order")]
+    [ProducesResponseType(typeof(DishForOrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDishForOrder(Guid id)
     {
         var result = await _getDishForOrderHandler.HandleAsync(
@@ -39,6 +46,10 @@ public class MenuIntegrationController : ControllerBase
     }
 
     [HttpGet("drinks/{id:guid}/for-order")]
+    [ProducesResponseType(typeof(DrinkForOrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDrinkForOrder(Guid id)
     {
         var result = await _getDrinkForOrderHandler.HandleAsync(
@@ -48,6 +59,9 @@ public class MenuIntegrationController : ControllerBase
     }
 
     [HttpGet("dishes/{id:guid}/exists")]
+    [ProducesResponseType(typeof(DishExistsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetDishExists(Guid id)
     {
         var result = await _getDishExistsHandler.HandleAsync(
@@ -57,6 +71,10 @@ public class MenuIntegrationController : ControllerBase
     }
 
     [HttpGet("dishes/{id:guid}/preparation-time")]
+    [ProducesResponseType(typeof(DishPreparationTimeDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDishPreparationTime(Guid id)
     {
         var result = await _getDishPreparationTimeHandler.HandleAsync(

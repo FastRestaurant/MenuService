@@ -1,4 +1,5 @@
-﻿using MenuService.Application.DTOs.Common;
+﻿using MenuService.Application.DTOs;
+using MenuService.Application.DTOs.Common;
 using MenuService.Application.DTOs.Drinks;
 using MenuService.Application.UseCases.Drinks.Commands;
 using MenuService.Application.UseCases.Drinks.Handlers;
@@ -37,6 +38,9 @@ public class DrinksController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(PagedResultDto<DrinkDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<PagedResultDto<DrinkDto>>> GetAll(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
@@ -57,6 +61,10 @@ public class DrinksController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(DrinkDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _getDrinkByIdHandler.HandleAsync(new GetDrinkByIdQuery { Id = id });
@@ -65,6 +73,10 @@ public class DrinksController : ControllerBase
     }
 
     [HttpGet("category/{categoryId:guid}")]
+    [ProducesResponseType(typeof(PagedResultDto<DrinkDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PagedResultDto<DrinkDto>>> GetByCategory(
         Guid categoryId,
         [FromQuery] int pageNumber = 1,
@@ -82,6 +94,12 @@ public class DrinksController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(DrinkDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] CreateDrinkDto dto)
     {
         var result = await _createDrinkHandler.HandleAsync(new CreateDrinkCommand
@@ -94,6 +112,12 @@ public class DrinksController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(DrinkDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDrinkDto dto)
     {
         var result = await _updateDrinkHandler.HandleAsync(new UpdateDrinkCommand
@@ -107,6 +131,10 @@ public class DrinksController : ControllerBase
 
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _deleteDrinkHandler.HandleAsync(new DeleteDrinkCommand { Id = id });

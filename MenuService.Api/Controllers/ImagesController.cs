@@ -24,7 +24,13 @@ public class ImagesController : ControllerBase
 
     [HttpPost]
     [RequestSizeLimit(MaxFileSize)]
-    public async Task<IActionResult> Upload([FromForm] IFormFile file)
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Upload(IFormFile file)
     {
         if (file is null || file.Length == 0)
             return Error(StatusCodes.Status400BadRequest, "Debe seleccionar una imagen.");
