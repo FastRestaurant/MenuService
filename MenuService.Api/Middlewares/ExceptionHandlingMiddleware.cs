@@ -1,5 +1,7 @@
 ﻿using MenuService.Application.DTOs;
 using MenuService.Domain.Exceptions;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace MenuService.Api.Middlewares;
 
@@ -38,12 +40,16 @@ public class ExceptionHandlingMiddleware
             NotFoundException => StatusCodes.Status404NotFound,
             ConflictException => StatusCodes.Status409Conflict,
             BusinessRuleException => StatusCodes.Status400BadRequest,
+            DbUpdateException dbUpdateException when IsUniqueConstraintViolation(dbUpdateException) => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
         };
 
-        var message = exception is NotFoundException or ConflictException or BusinessRuleException
-            ? exception.Message
-            : "Ocurrio un error inesperado.";
+        var message = exception switch
+        {
+            NotFoundException or ConflictException or BusinessRuleException => exception.Message,
+            DbUpdateException dbUpdateException when IsUniqueConstraintViolation(dbUpdateException) => "Ya existe un recurso con esos datos.",
+            _ => "Ocurrio un error inesperado."
+        };
 
         if (statusCode == StatusCodes.Status500InternalServerError)
             logger.LogError(exception, "Ocurrio una excepcion no controlada mientras se procesaba la solicitud.");
@@ -57,5 +63,11 @@ public class ExceptionHandlingMiddleware
             StatusCode = statusCode,
             Timestamp = DateTime.UtcNow
         });
+    }
+
+    private static bool IsUniqueConstraintViolation(DbUpdateException exception)
+    {
+        return exception.InnerException is SqlException sqlException &&
+            (sqlException.Number == 2601 || sqlException.Number == 2627);
     }
 }

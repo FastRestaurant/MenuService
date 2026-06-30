@@ -27,12 +27,20 @@ public class GetDishesByCategoryHandler
 
     public async Task<PagedResultDto<DishDto>> HandleAsync(GetDishesByCategoryQuery query)
     {
+        if (query.PageNumber < 1) query.PageNumber = 1;
+        if (query.PageSize < 1) query.PageSize = 10;
+        if (query.PageSize > 50) query.PageSize = 50;
+
         var category = await _categoryRepository.GetByIdAsync(query.CategoryId);
 
         if (category is null)
             throw new NotFoundException("La categoría no fue encontrada.");
 
         var totalItems = await _dishRepository.CountByCategoryIdAsync(query.CategoryId);
+        var totalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize);
+
+        if (totalPages > 0 && query.PageNumber > totalPages)
+            query.PageNumber = totalPages;
 
         var dishes = await _dishRepository.GetByCategoryIdAsync(
             query.CategoryId,
@@ -60,7 +68,7 @@ public class GetDishesByCategoryHandler
             PageNumber = query.PageNumber,
             PageSize = query.PageSize,
             TotalItems = totalItems,
-            TotalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize)
+            TotalPages = totalPages
         };
     }
 }
