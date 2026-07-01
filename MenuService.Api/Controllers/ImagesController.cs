@@ -52,25 +52,21 @@ public class ImagesController : ControllerBase
         var folder = _configuration["Cloudinary:Folder"] ?? "fastrestaurant";
         var signature = BuildSignature(folder, timestamp, apiSecret);
 
-        using var content = new MultipartFormDataContent
-        {
-            { new StringContent(apiKey), "api_key" },
-            { new StringContent(timestamp), "timestamp" },
-            { new StringContent(folder), "folder" },
-            { new StringContent(signature), "signature" }
-        };
+        using var content = new MultipartFormDataContent();
 
         await using var stream = file.OpenReadStream();
-        using var fileContent = new StreamContent(stream);
+        using var memory = new MemoryStream();
+        await stream.CopyToAsync(memory);
+        using var fileContent = new ByteArrayContent(memory.ToArray());
         fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
         content.Add(fileContent, "file", file.FileName);
 
         var client = _httpClientFactory.CreateClient();
-        var response = await client.PostAsync($"https://api.cloudinary.com/v1_1/{cloudName}/image/upload", content);
+        var response = await client.PostAsync(BuildUploadUrl(cloudName, apiKey, timestamp, folder, signature), content);
         var responseBody = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
-            return Error((int)response.StatusCode, "Cloudinary rechazó la imagen.");
+            return Error((int)response.StatusCode, BuildCloudinaryErrorMessage(responseBody));
 
         using var json = JsonDocument.Parse(responseBody);
         var url = json.RootElement.GetProperty("secure_url").GetString();
@@ -83,6 +79,40 @@ public class ImagesController : ControllerBase
         var value = $"folder={folder}&timestamp={timestamp}{apiSecret}";
         var bytes = SHA1.HashData(Encoding.UTF8.GetBytes(value));
         return Convert.ToHexString(bytes).ToLowerInvariant();
+    }
+
+    private static string BuildUploadUrl(string cloudName, string apiKey, string timestamp, string folder, string signature)
+    {
+        return $"https://api.cloudinary.com/v1_1/{Uri.EscapeDataString(cloudName)}/image/upload" +
+            $"?api_key={Uri.EscapeDataString(apiKey)}" +
+            $"&timestamp={Uri.EscapeDataString(timestamp)}" +
+            $"&folder={Uri.EscapeDataString(folder)}" +
+            $"&signature={Uri.EscapeDataString(signature)}";
+    }
+
+    private static string BuildCloudinaryErrorMessage(string responseBody)
+    {
+        const string fallbackMessage = "Cloudinary rechazó la imagen.";
+
+        if (string.IsNullOrWhiteSpace(responseBody))
+            return fallbackMessage;
+
+        try
+        {
+            using var json = JsonDocument.Parse(responseBody);
+            if (json.RootElement.TryGetProperty("error", out var error) &&
+                error.TryGetProperty("message", out var message) &&
+                !string.IsNullOrWhiteSpace(message.GetString()))
+            {
+                return $"{fallbackMessage} {message.GetString()}";
+            }
+        }
+        catch (JsonException)
+        {
+            return fallbackMessage;
+        }
+
+        return fallbackMessage;
     }
 
     private static ObjectResult Error(int statusCode, string message)
